@@ -36,11 +36,35 @@
             padding: 24px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
+        label {
+            font-weight: 600;
+        }
+        input {
+            width: 100%;
+            max-width: 360px;
+            padding: 8px 10px;
+            border: 1px solid #b8c2cc;
+            border-radius: 6px;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #1f4e79;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 20px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #163a5a;
+        }
     </style>
 </head>
 <body>
     <header>
-        <strong>MBG Laporan</strong>
+        <strong>Pantau MBG</strong>
         <nav>
             <a href="{{ url('/') }}">Beranda</a>
         </nav>
