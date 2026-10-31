@@ -119,4 +119,20 @@ class ReportCreationTest extends TestCase
         $this->assertSame($pelapor->id, $report->user_id);
         $this->assertSame('submitted', $report->status);
     }
+
+    public function test_distribution_must_belong_to_selected_school(): void
+    {
+        $pelapor = User::factory()->create(['role' => 'pelapor']);
+        [$school, $distribution] = $this->makeSchoolAndDistribution();
+        $otherSchool = School::create(['name' => 'SD Uji Lain', 'address' => 'Alamat lain']);
+
+        // sekolah dipilih: $otherSchool, tapi distribusi milik $school
+        $payload = $this->validPayload($otherSchool, $distribution);
+
+        $this->actingAs($pelapor)
+            ->post('/reports', $payload)
+            ->assertSessionHasErrors('meal_distribution_id');
+
+        $this->assertDatabaseCount('reports', 0);
+    }
 }
