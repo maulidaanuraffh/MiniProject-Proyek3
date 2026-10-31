@@ -1,0 +1,43 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\MealDistribution;
+use App\Models\Report;
+use App\Models\School;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
+
+class ReportController extends Controller
+{
+    public function create(): View
+    {
+        return view('reports.create', [
+            'schools' => School::orderBy('name')->get(),
+            'distributions' => MealDistribution::with('school')
+                ->orderByDesc('distribution_date')
+                ->get(),
+        ]);
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'school_id' => ['required', 'integer', 'exists:schools,id'],
+            'meal_distribution_id' => ['required', 'integer', 'exists:meal_distributions,id'],
+            'title' => ['required', 'string', 'max:150'],
+            'incident_description' => ['required', 'string', 'max:5000'],
+            'symptoms' => ['required', 'string', 'max:5000'],
+            'affected_count' => ['nullable', 'integer', 'min:1'],
+            'incident_date' => ['required', 'date', 'before_or_equal:today'],
+        ]);
+
+        Report::create([
+            ...$validated,
+            'user_id' => $request->user()->id,
+        ]);
+
+        return redirect()->route('reports.create')->with('status', 'Laporan berhasil dikirim.');
+    }
+}
