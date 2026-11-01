@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Daftar Laporan')
+@section('title', $isStaff ? 'Daftar Laporan' : 'Laporan Saya')
 
 @section('content')
     <div class="card">
-        <h1>Daftar Laporan</h1>
+        <h1>{{ $isStaff ? 'Daftar Laporan' : 'Laporan Saya' }}</h1>
 
         <form method="GET" action="{{ route('reports.index') }}" class="filter-form">
             <div class="filter-field">
@@ -44,7 +44,9 @@
                         <th>Sekolah</th>
                         <th>Tanggal kejadian</th>
                         <th>Status</th>
-                        <th>Ditandai</th>
+                        @if ($isStaff)
+                            <th>Ditandai</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -55,11 +57,15 @@
                             <td>{{ $report->school->name }}</td>
                             <td>{{ $report->incident_date->format('d M Y') }}</td>
                             <td><span class="badge badge-{{ $report->status }}">{{ $report->status }}</span></td>
-                            <td>{{ $report->flagged_for_forwarding ? 'Ya' : 'Tidak' }}</td>
+                            @if ($isStaff)
+                                <td>{{ $report->flagged_for_forwarding ? 'Ya' : 'Tidak' }}</td>
+                            @endif
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="empty">Tidak ada laporan yang sesuai filter.</td>
+                            <td colspan="{{ $isStaff ? 6 : 5 }}" class="empty">
+                                {{ $isStaff ? 'Tidak ada laporan yang sesuai filter.' : 'Anda belum pernah mengirim laporan.' }}
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>

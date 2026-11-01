@@ -19,8 +19,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/schools/{school}/distributions', [SchoolDistributionController::class, 'index'])
         ->name('schools.distributions');
-    Route::get('/reports/{report}/evidence', [ReportController::class, 'evidence'])
-        ->name('reports.evidence');
     });
 
 Route::middleware(['auth', 'role:pelapor'])->group(function () {
@@ -28,9 +26,14 @@ Route::middleware(['auth', 'role:pelapor'])->group(function () {
     Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
 });
 
-Route::middleware(['auth', 'role:pemantau,koordinator'])->group(function () {
+Route::middleware('auth')->group(function () {
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
+    Route::get('/reports/{report}/evidence', [ReportController::class, 'evidence'])
+        ->name('reports.evidence');
+});
+
+Route::middleware(['auth', 'role:pemantau,koordinator'])->group(function () {
     Route::get('/rekap', [RecapController::class, 'index'])->name('recap.index');
     });
 

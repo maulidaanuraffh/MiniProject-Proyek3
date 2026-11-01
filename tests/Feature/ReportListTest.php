@@ -47,11 +47,11 @@ class ReportListTest extends TestCase
         $this->get('/reports')->assertRedirect('/login');
     }
 
-    public function test_pelapor_cannot_open_report_list(): void
+    public function test_pelapor_can_open_report_list_but_sees_only_own(): void
     {
         $pelapor = User::factory()->create(['role' => 'pelapor']);
 
-        $this->actingAs($pelapor)->get('/reports')->assertForbidden();
+        $this->actingAs($pelapor)->get('/reports')->assertOk();
     }
 
     public function test_pemantau_sees_reports(): void
