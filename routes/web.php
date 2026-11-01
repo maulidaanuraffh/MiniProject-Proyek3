@@ -18,6 +18,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/schools/{school}/distributions', [SchoolDistributionController::class, 'index'])
         ->name('schools.distributions');
+    Route::get('/reports/{report}/evidence', [ReportController::class, 'evidence'])
+        ->name('reports.evidence');
     });
 
 Route::middleware(['auth', 'role:pelapor'])->group(function () {
@@ -38,3 +40,5 @@ Route::middleware(['auth', 'role:koordinator'])->group(function () {
     Route::post('/reports/{report}/forward', [ReportController::class, 'forward'])->name('reports.forward');
     Route::post('/reports/{report}/close', [ReportController::class, 'close'])->name('reports.close');
 });
+
+

@@ -20,7 +20,7 @@
             </ul>
         @endif
 
-        <form method="POST" action="{{ route('reports.store') }}">
+        <form method="POST" action="{{ route('reports.store') }}" enctype="multipart/form-data">
             @csrf
 
             <p>
@@ -65,6 +65,11 @@
             <p>
                 <label for="incident_description">Deskripsi kejadian</label><br>
                 <textarea id="incident_description" name="incident_description" rows="5" required>{{ old('incident_description') }}</textarea>
+            </p>
+
+            <p>
+                <label for="evidence">Bukti pendukung (opsional, JPG/PNG/PDF, maks. 2 MB)</label><br>
+                <input id="evidence" name="evidence" type="file" accept=".jpg,.jpeg,.png,.pdf">
             </p>
 
             <button type="submit">Kirim Laporan</button>
@@ -127,7 +132,6 @@
                 loadDistributions(schoolSelect.value);
             });
 
-            // Jika form dikembalikan karena error validasi, isi ulang distribusinya
             if (schoolSelect.value) {
                 loadDistributions(schoolSelect.value);
             }

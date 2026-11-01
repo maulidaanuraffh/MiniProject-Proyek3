@@ -52,6 +52,16 @@
                         <td>{{ $report->incident_description }}</td>
                     </tr>
                     <tr>
+                        <th>Bukti pendukung</th>
+                        <td>
+                            @if ($report->evidence_path)
+                                <a href="{{ route('reports.evidence', $report) }}">{{ $report->evidence_original_name }}</a>
+                            @else
+                                -
+                            @endif
+                        </td>
+                    </tr>
+                    <tr>
                         <th>Ditinjau oleh</th>
                         <td>{{ $report->monitor?->name ?? '-' }}</td>
                     </tr>
@@ -63,6 +73,18 @@
                         <th>Ditandai untuk diteruskan</th>
                         <td>{{ $report->flagged_for_forwarding ? 'Ya' : 'Tidak' }}</td>
                     </tr>
+                    @if ($report->forwarded_to)
+                        <tr>
+                            <th>Diteruskan kepada</th>
+                            <td>{{ $report->forwarded_to }}</td>
+                        </tr>
+                    @endif
+                    @if ($report->coordinator_notes)
+                        <tr>
+                            <th>Catatan koordinator</th>
+                            <td>{{ $report->coordinator_notes }}</td>
+                        </tr>
+                    @endif
                 </tbody>
             </table>
         </div>
@@ -75,7 +97,7 @@
 
                 <p>
                     <label for="monitor_notes">Catatan pemantau (opsional)</label><br>
-                    <textarea id="monitor_notes" name="monitor_notes" rows="4" style="width: 100%; max-width: 560px;">{{ old('monitor_notes') }}</textarea>
+                    <textarea id="monitor_notes" name="monitor_notes" rows="4">{{ old('monitor_notes') }}</textarea>
                 </p>
 
                 <p>

@@ -8,9 +8,12 @@ use App\Models\School;
 use App\Services\ReportStatusService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ReportController extends Controller
 {
@@ -51,6 +54,19 @@ class ReportController extends Controller
             'report' => $report->load(['school', 'mealDistribution', 'monitor']),
             'forwardTargets' => self::FORWARD_TARGETS,
         ]);
+    }
+
+    public function evidence(Report $report): StreamedResponse
+    {
+        Gate::authorize('view', $report);
+
+        abort_unless(
+            $report->evidence_path && Storage::disk('local')->exists($report->evidence_path),
+            404,
+        );
+
+        // Diunduh, bukan ditampilkan inline, supaya PDF dari pengguna tidak dirender di browser
+        return Storage::disk('local')->download($report->evidence_path, $report->evidence_original_name);
     }
 
     public function review(Request $request, Report $report, ReportStatusService $statusService): RedirectResponse
@@ -120,6 +136,7 @@ class ReportController extends Controller
             'symptoms' => ['required', 'string', 'max:5000'],
             'affected_count' => ['nullable', 'integer', 'min:1'],
             'incident_date' => ['required', 'date', 'before_or_equal:today'],
+            'evidence' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
         ]);
 
         // BR-02: distribusi harus milik sekolah yang dipilih
@@ -131,8 +148,18 @@ class ReportController extends Controller
             ]);
         }
 
+        // File bukan kolom database, jadi dibuang dari data yang akan disimpan
+        $data = Arr::except($validated, ['evidence']);
+
+        if ($request->hasFile('evidence')) {
+            $file = $request->file('evidence');
+
+            $data['evidence_path'] = $file->store('evidence', 'local');
+            $data['evidence_original_name'] = $file->getClientOriginalName();
+        }
+
         $report = Report::create([
-            ...$validated,
+            ...$data,
             'user_id' => $request->user()->id,
         ]);
 
