@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RecapController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SchoolDistributionController;
 use Illuminate\Support\Facades\Route;
@@ -30,7 +31,8 @@ Route::middleware(['auth', 'role:pelapor'])->group(function () {
 Route::middleware(['auth', 'role:pemantau,koordinator'])->group(function () {
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
-});
+    Route::get('/rekap', [RecapController::class, 'index'])->name('recap.index');
+    });
 
 Route::middleware(['auth', 'role:pemantau'])->group(function () {
     Route::post('/reports/{report}/review', [ReportController::class, 'review'])->name('reports.review');
