@@ -1,58 +1,173 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Pantau MBG
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi web untuk pelaporan, peninjauan, tindak lanjut, dan pemantauan laporan keamanan makanan Program MBG. Dibuat sebagai Mini Project Proyek 3 (Kasus A) D3 Teknik Informatika Politeknik Negeri Bandung.
 
-## About Laravel
+## Identitas
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Nama:** Maulida Nur Afifah
+- **NIM:** 251511017
+- **Kelas:** 2A
+- **Judul:** Pelaporan dan Pemantauan Keamanan Makanan MBG
+- **URL Repository:** https://github.com/maulidaanuraffh/MiniProject-Proyek3
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Kebutuhan Environment
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.5 (dengan ekstensi standar Laravel, termasuk `pdo_mysql` dan `fileinfo`)
+- Composer 2.x
+- MySQL 8 atau MariaDB 10.4 (dikembangkan dan diuji dengan MariaDB 10.4)
+- Node.js 20 atau lebih baru dan npm
+- Git
+- Windows dengan XAMPP (opsional, untuk menjalankan MariaDB)
 
-## Learning Laravel
+## Langkah Instalasi
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1. Clone repository:
+   ```bash
+   git clone https://github.com/maulidaanuraffh/MiniProject-Proyek3.git mini-project-mbg
+   cd mini-project-mbg
+   ```
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. Salin file konfigurasi dan buat application key:
+   ```bash
+   copy .env.example .env
+   php artisan key:generate
+   ```
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+3. Install dependensi PHP dan JavaScript:
+   ```bash
+   composer install
+   npm install
+   npm run build
+   ```
 
-## Agentic Development
+4. Buat database kosong di MariaDB atau MySQL:
+   ```sql
+   CREATE DATABASE mbg_laporan CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   ```
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Konfigurasi Database
 
-```bash
-composer require laravel/boost --dev
+Ubah bagian database di file `.env`:
 
-php artisan boost:install
+```env
+DB_CONNECTION=mariadb
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=mbg_laporan
+DB_USERNAME=root
+DB_PASSWORD=
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Jika MySQL 8 yang dipakai, ganti `DB_CONNECTION` menjadi `mysql`.
 
-## Contributing
+Jangan commit file `.env`. File ini sudah masuk `.gitignore`.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Migration dan Seeding
 
-## Code of Conduct
+Jalankan migration untuk membuat tabel:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+php artisan migrate
+```
 
-## Security Vulnerabilities
+Isi data demo (akun, sekolah, distribusi, dan laporan dalam berbagai status):
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+php artisan db:seed
+```
 
-## License
+Seeder aman dijalankan berulang kali. Data yang sama tidak akan terduplikasi.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Akun Demo
+
+Semua akun memakai password `password`.
+
+| Role | Email | Keterangan |
+|---|---|---|
+| Pelapor | `pelapor@demo.test` | Membuat laporan dan melihat laporan miliknya sendiri |
+| Pemantau Komunitas | `pemantau@demo.test` | Melihat semua laporan, meninjau, dan melihat rekap |
+| Koordinator Komunitas | `koordinator@demo.test` | Melihat semua laporan, meneruskan, menutup, melihat rekap, dan mengelola sekolah dan distribusi |
+
+Registrasi publik hanya membuat akun dengan role Pelapor. Akun Pemantau dan Koordinator hanya dibuat lewat seeder.
+
+## Cara Menjalankan Aplikasi
+
+```bash
+php artisan serve
+```
+
+Buka `http://127.0.0.1:8000` di browser. Halaman `/` akan mengarahkan ke dashboard, dan jika belum login, ke halaman login.
+
+## Fitur Utama
+
+- **Autentikasi:** registrasi (khusus pelapor), login, dan logout dengan session.
+- **Pelaporan:** form laporan dengan validasi di server. Pelapor memilih sekolah lalu distribusi yang sesuai.
+- **Bukti pendukung:** satu file per laporan, format JPG, JPEG, PNG, atau PDF, maksimal 2 MB. File disimpan di `storage/app/private/evidence` dengan nama acak, dan hanya bisa diunduh oleh pihak yang berwenang.
+- **Peninjauan dan tindak lanjut:** pemantau meninjau laporan dan dapat menandainya untuk diteruskan. Koordinator meneruskan lalu menutup laporan.
+- **Daftar laporan:** filter status dan sekolah, serta pagination yang mempertahankan filter. Pelapor hanya melihat laporannya sendiri.
+- **Rekap:** tiga ringkasan (total, sedang diproses, sudah diteruskan), tabel per sekolah, dan filter rentang tanggal kejadian.
+- **Pengelolaan data:** koordinator menambah sekolah dan distribusi makanan.
+- **Log perubahan status:** setiap perubahan status dicatat di tabel `report_status_logs` lewat Eloquent Observer.
+
+## Alur Status Laporan
+
+```
+submitted → under_review → forwarded → closed
+```
+
+- `submitted` → `under_review`: dilakukan pemantau. Laporan dapat ditandai untuk diteruskan.
+- `under_review` → `forwarded`: dilakukan koordinator, hanya untuk laporan yang sudah ditandai pemantau.
+- `forwarded` → `closed`: dilakukan koordinator.
+
+Status tidak bisa melompat. Perubahan yang melanggar alur ditolak di server.
+
+## Business Rule
+
+- **BR-01:** Pelapor hanya dapat mengedit laporannya saat status masih `submitted`.
+- **BR-02:** Distribusi yang dipilih harus milik sekolah yang dipilih.
+- **BR-03:** Transisi status harus mengikuti urutan alur dan dilakukan oleh role yang berwenang. Koordinator hanya dapat meneruskan laporan yang sudah ditandai pemantau.
+
+Tambahan:
+- Satu sekolah tidak boleh memiliki dua distribusi pada tanggal yang sama.
+- Nama sekolah harus unik.
+
+## Access Matrix
+
+| Aktivitas | Pelapor | Pemantau | Koordinator |
+|---|:---:|:---:|:---:|
+| Login dan logout | ✓ | ✓ | ✓ |
+| Membuat laporan | ✓ | ✗ | ✗ |
+| Melihat laporan miliknya | ✓ | ✓ | ✓ |
+| Melihat semua laporan | ✗ | ✓ | ✓ |
+| Mengedit laporan miliknya (saat `submitted`) | ✓ | ✗ | ✗ |
+| Mengunduh bukti laporan | Miliknya saja | ✓ | ✓ |
+| Meninjau laporan | ✗ | ✓ | ✗ |
+| Meneruskan laporan | ✗ | ✗ | ✓ |
+| Menutup laporan | ✗ | ✗ | ✓ |
+| Melihat rekap | ✗ | ✓ | ✓ |
+| Mengelola sekolah dan distribusi | ✗ | ✗ | ✓ |
+
+Pembatasan ini dijaga di server lewat middleware `role` dan `ReportPolicy`. Menyembunyikan tombol di tampilan tidak dianggap sebagai pembatasan.
+
+## Pengujian
+
+Jalankan seluruh test otomatis:
+
+```bash
+php artisan test
+```
+
+Test memakai SQLite di memori (sesuai `phpunit.xml`), sehingga tidak mengubah data di MariaDB.
+
+Acceptance criteria AC-01 sampai AC-13 diuji lewat test feature dan uji manual sesuai dokumen spesifikasi.
+
+## Struktur Singkat
+
+- `app/Http/Controllers/` — controller auth, laporan, rekap, pengelolaan data, dan distribusi JSON
+- `app/Services/ReportStatusService.php` — aturan transisi status (BR-03)
+- `app/Policies/ReportPolicy.php` — aturan kepemilikan dan akses laporan
+- `app/Observers/ReportObserver.php` — pencatatan perubahan status
+- `app/Http/Middleware/EnsureRole.php` — pembatasan berdasarkan role
+- `database/migrations/` dan `database/seeders/` — struktur tabel dan data demo
+- `resources/views/` — tampilan Blade
+- `tests/Feature/` — test otomatis
