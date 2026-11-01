@@ -7,6 +7,7 @@ use App\Models\Report;
 use App\Models\School;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class ReportController extends Controller
@@ -33,11 +34,22 @@ class ReportController extends Controller
             'incident_date' => ['required', 'date', 'before_or_equal:today'],
         ]);
 
-        Report::create([
+        // BR-02: distribusi harus milik sekolah yang dipilih
+        $distribution = MealDistribution::findOrFail($validated['meal_distribution_id']);
+
+        if ((int) $distribution->school_id !== (int) $validated['school_id']) {
+            throw ValidationException::withMessages([
+                'meal_distribution_id' => 'Distribusi yang dipilih bukan milik sekolah tersebut.',
+            ]);
+        }
+
+        $report = Report::create([
             ...$validated,
             'user_id' => $request->user()->id,
         ]);
 
-        return redirect()->route('reports.create')->with('status', 'Laporan berhasil dikirim.');
+        return redirect()
+            ->route('reports.create')
+            ->with('status', 'Laporan "'.$report->title.'" berhasil dikirim dan tercatat dengan status '.$report->status.'.');
     }
 }
