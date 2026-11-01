@@ -24,3 +24,7 @@ Route::middleware(['auth', 'role:pelapor'])->group(function () {
     Route::get('/reports/create', [ReportController::class, 'create'])->name('reports.create');
     Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
 });
+
+Route::middleware(['auth', 'role:pemantau,koordinator'])->group(function () {
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+});

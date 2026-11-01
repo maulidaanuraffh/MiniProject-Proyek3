@@ -12,6 +12,32 @@ use Illuminate\View\View;
 
 class ReportController extends Controller
 {
+    private const STATUSES = ['submitted', 'under_review', 'forwarded', 'closed'];
+
+    private const PER_PAGE = 10;
+
+    public function index(Request $request): View
+    {
+        $filters = $request->validate([
+            'status' => ['nullable', 'in:'.implode(',', self::STATUSES)],
+            'school_id' => ['nullable', 'integer', 'exists:schools,id'],
+        ]);
+
+        $reports = Report::with('school')
+            ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
+            ->when($filters['school_id'] ?? null, fn ($query, $schoolId) => $query->where('school_id', $schoolId))
+            ->orderByDesc('id')
+            ->paginate(self::PER_PAGE)
+            ->withQueryString();
+
+        return view('reports.index', [
+            'reports' => $reports,
+            'schools' => School::orderBy('name')->get(),
+            'statuses' => self::STATUSES,
+            'filters' => $filters,
+        ]);
+    }
+
     public function create(): View
     {
         return view('reports.create', [

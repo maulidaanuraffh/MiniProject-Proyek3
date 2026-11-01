@@ -10,6 +10,8 @@
 
         @if (auth()->user()->role === 'pelapor')
             <p><a href="{{ route('reports.create') }}">Buat Laporan Kejadian</a></p>
+        @elseif (in_array(auth()->user()->role, ['pemantau', 'koordinator'], true))
+            <p><a href="{{ route('reports.index') }}">Daftar Laporan</a></p>
         @endif
 
         <form method="POST" action="{{ route('logout') }}">
