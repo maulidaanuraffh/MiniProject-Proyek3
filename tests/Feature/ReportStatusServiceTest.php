@@ -47,9 +47,9 @@ class ReportStatusServiceTest extends TestCase
             'incident_date' => '2026-10-20',
         ]);
 
-        // status tidak ada di $fillable, jadi diatur langsung
-        $report->status = $status;
-        $report->save();
+        // Status diatur lewat query builder supaya tidak memicu Observer.
+        // Kalau memakai $report->save(), Observer mencatat status lama null.
+        Report::whereKey($report->id)->update(['status' => $status]);
 
         return $report->fresh();
     }
