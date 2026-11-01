@@ -11,9 +11,13 @@
         @if (auth()->user()->role === 'pelapor')
             <p><a href="{{ route('reports.create') }}">Buat Laporan Kejadian</a></p>
             <p><a href="{{ route('reports.index') }}">Laporan Saya</a></p>
-        @elseif (in_array(auth()->user()->role, ['pemantau', 'koordinator'], true))
+        @elseif (auth()->user()->role === 'pemantau')
             <p><a href="{{ route('reports.index') }}">Daftar Laporan</a></p>
             <p><a href="{{ route('recap.index') }}">Rekap Laporan</a></p>
+        @elseif (auth()->user()->role === 'koordinator')
+            <p><a href="{{ route('reports.index') }}">Daftar Laporan</a></p>
+            <p><a href="{{ route('recap.index') }}">Rekap Laporan</a></p>
+            <p><a href="{{ route('manage.schools.index') }}">Kelola Sekolah dan Distribusi</a></p>
         @endif
 
         <form method="POST" action="{{ route('logout') }}">

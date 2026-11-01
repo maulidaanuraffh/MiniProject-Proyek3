@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DataManagementController;
 use App\Http\Controllers\RecapController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SchoolDistributionController;
@@ -44,6 +45,13 @@ Route::middleware(['auth', 'role:pemantau'])->group(function () {
 Route::middleware(['auth', 'role:koordinator'])->group(function () {
     Route::post('/reports/{report}/forward', [ReportController::class, 'forward'])->name('reports.forward');
     Route::post('/reports/{report}/close', [ReportController::class, 'close'])->name('reports.close');
+
+    Route::get('/kelola/sekolah', [DataManagementController::class, 'schoolsIndex'])
+        ->name('manage.schools.index');
+    Route::post('/kelola/sekolah', [DataManagementController::class, 'storeSchool'])
+        ->name('manage.schools.store');
+    Route::get('/kelola/sekolah/{school}/distribusi', [DataManagementController::class, 'distributionsIndex'])
+        ->name('manage.distributions.index');
+    Route::post('/kelola/sekolah/{school}/distribusi', [DataManagementController::class, 'storeDistribution'])
+        ->name('manage.distributions.store');
 });
-
-
