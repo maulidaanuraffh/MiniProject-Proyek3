@@ -88,5 +88,43 @@
                 <button type="submit">Tinjau Laporan</button>
             </form>
         @endif
+
+        @if (auth()->user()->role === 'koordinator' && $report->status === 'under_review')
+            <h2 style="margin-top: 28px;">Teruskan Laporan</h2>
+
+            @if (! $report->flagged_for_forwarding)
+                <p style="color: #7a5a00;">Laporan ini belum ditandai pemantau untuk diteruskan.</p>
+            @else
+                <form method="POST" action="{{ route('reports.forward', $report) }}">
+                    @csrf
+
+                    <p>
+                        <label for="forwarded_to">Diteruskan kepada</label><br>
+                        <select id="forwarded_to" name="forwarded_to" required>
+                            <option value="">-- pilih tujuan --</option>
+                            @foreach ($forwardTargets as $target)
+                                <option value="{{ $target }}" @selected(old('forwarded_to') === $target)>{{ $target }}</option>
+                            @endforeach
+                        </select>
+                    </p>
+
+                    <p>
+                        <label for="coordinator_notes">Catatan penerusan (opsional)</label><br>
+                        <textarea id="coordinator_notes" name="coordinator_notes" rows="4">{{ old('coordinator_notes') }}</textarea>
+                    </p>
+
+                    <button type="submit">Teruskan Laporan</button>
+                </form>
+            @endif
+        @endif
+
+        @if (auth()->user()->role === 'koordinator' && $report->status === 'forwarded')
+            <h2 style="margin-top: 28px;">Tutup Laporan</h2>
+
+            <form method="POST" action="{{ route('reports.close', $report) }}">
+                @csrf
+                <button type="submit">Tutup Laporan</button>
+            </form>
+        @endif
     </div>
 @endsection

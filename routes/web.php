@@ -33,3 +33,8 @@ Route::middleware(['auth', 'role:pemantau,koordinator'])->group(function () {
 Route::middleware(['auth', 'role:pemantau'])->group(function () {
     Route::post('/reports/{report}/review', [ReportController::class, 'review'])->name('reports.review');
 });
+
+Route::middleware(['auth', 'role:koordinator'])->group(function () {
+    Route::post('/reports/{report}/forward', [ReportController::class, 'forward'])->name('reports.forward');
+    Route::post('/reports/{report}/close', [ReportController::class, 'close'])->name('reports.close');
+});

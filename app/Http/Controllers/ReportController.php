@@ -18,6 +18,8 @@ class ReportController extends Controller
 
     private const PER_PAGE = 10;
 
+    private const FORWARD_TARGETS = ['Sekolah', 'SPPG', 'Fasilitas kesehatan', 'Instansi terkait lainnya'];
+
     public function index(Request $request): View
     {
         $filters = $request->validate([
@@ -47,6 +49,7 @@ class ReportController extends Controller
         // Nama pelapor sengaja tidak dimuat dan tidak ditampilkan (spesifikasi bagian 2)
         return view('reports.show', [
             'report' => $report->load(['school', 'mealDistribution', 'monitor']),
+            'forwardTargets' => self::FORWARD_TARGETS,
         ]);
     }
 
@@ -67,6 +70,34 @@ class ReportController extends Controller
         return redirect()
             ->route('reports.show', $report)
             ->with('status', 'Laporan berhasil ditinjau dan statusnya menjadi under_review.');
+    }
+
+    public function forward(Request $request, Report $report, ReportStatusService $statusService): RedirectResponse
+    {
+        $validated = $request->validate([
+            'forwarded_to' => ['required', 'string', 'in:'.implode(',', self::FORWARD_TARGETS)],
+            'coordinator_notes' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        $statusService->forward(
+            $report,
+            $request->user(),
+            $validated['forwarded_to'],
+            $validated['coordinator_notes'] ?? null,
+        );
+
+        return redirect()
+            ->route('reports.show', $report)
+            ->with('status', 'Laporan berhasil diteruskan ke '.$validated['forwarded_to'].'.');
+    }
+
+    public function close(Request $request, Report $report, ReportStatusService $statusService): RedirectResponse
+    {
+        $statusService->close($report, $request->user());
+
+        return redirect()
+            ->route('reports.show', $report)
+            ->with('status', 'Laporan berhasil ditutup.');
     }
 
     public function create(): View
