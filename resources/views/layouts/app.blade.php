@@ -212,6 +212,44 @@
             font-size: 14px;
             margin-top: 14px;
         }
+        .dashboard-header {
+            margin-bottom: 20px;
+        }
+        .dashboard-header h1 {
+            margin: 0 0 4px;
+        }
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+        }
+        .menu-card {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background: #ffffff;
+            border: 1px solid #e4e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            text-decoration: none;
+            color: #1f2933;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            transition: box-shadow 0.15s, border-color 0.15s;
+        }
+        .menu-card:hover {
+            border-color: #1f4e79;
+            box-shadow: 0 4px 12px rgba(31, 78, 121, 0.15);
+        }
+        .menu-title {
+            font-weight: 600;
+            font-size: 17px;
+            color: #1f4e79;
+        }
+        .menu-desc {
+            font-size: 14px;
+            color: #52606d;
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>

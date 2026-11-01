@@ -3,28 +3,57 @@
 @section('title', 'Dashboard')
 
 @section('content')
-    <div class="card">
-        <h1>Dashboard</h1>
+    @php
+        $user = auth()->user();
+        $roleLabel = [
+            'pelapor' => 'Pelapor',
+            'pemantau' => 'Pemantau Komunitas',
+            'koordinator' => 'Koordinator Komunitas',
+        ][$user->role] ?? $user->role;
+    @endphp
 
-        <p>Halo, {{ auth()->user()->name }} (role: {{ auth()->user()->role }}).</p>
+    <div class="card dashboard-header">
+        <div>
+            <h1>Halo, {{ $user->name }}</h1>
+            <p class="total">Role: {{ $roleLabel }}</p>
+        </div>
+    </div>
 
-        @if (auth()->user()->role === 'pelapor')
-            <p><a href="{{ route('reports.create') }}">Buat Laporan Kejadian</a></p>
-            <p><a href="{{ route('reports.index') }}">Laporan Saya</a></p>
-        @elseif (auth()->user()->role === 'pemantau')
-            <p><a href="{{ route('reports.index') }}">Daftar Laporan</a></p>
-            <p><a href="{{ route('recap.index') }}">Rekap Laporan</a></p>
-        @elseif (auth()->user()->role === 'koordinator')
-            <p><a href="{{ route('reports.index') }}">Daftar Laporan</a></p>
-            <p><a href="{{ route('recap.index') }}">Rekap Laporan</a></p>
-            <p><a href="{{ route('manage.schools.index') }}">Kelola Sekolah dan Distribusi</a></p>
+    <div class="menu-grid">
+        @if ($user->role === 'pelapor')
+            <a class="menu-card" href="{{ route('reports.create') }}">
+                <span class="menu-title">Buat Laporan Kejadian</span>
+                <span class="menu-desc">Laporkan kejadian setelah mengonsumsi makanan MBG, lengkap dengan bukti pendukung.</span>
+            </a>
+
+            <a class="menu-card" href="{{ route('reports.index') }}">
+                <span class="menu-title">Laporan Saya</span>
+                <span class="menu-desc">Pantau status laporan yang sudah kamu kirim.</span>
+            </a>
         @endif
 
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button type="submit">Logout</button>
-        </form>
+        @if (in_array($user->role, ['pemantau', 'koordinator'], true))
+            <a class="menu-card" href="{{ route('reports.index') }}">
+                <span class="menu-title">Daftar Laporan</span>
+                <span class="menu-desc">Lihat semua laporan, filter berdasarkan status atau sekolah.</span>
+            </a>
 
-        <p>Selamat datang di aplikasi pelaporan keamanan makanan MBG.</p>
+            <a class="menu-card" href="{{ route('recap.index') }}">
+                <span class="menu-title">Rekap Laporan</span>
+                <span class="menu-desc">Ringkasan jumlah laporan per status dan per sekolah.</span>
+            </a>
+        @endif
+
+        @if ($user->role === 'koordinator')
+            <a class="menu-card" href="{{ route('manage.schools.index') }}">
+                <span class="menu-title">Kelola Sekolah dan Distribusi</span>
+                <span class="menu-desc">Tambah sekolah dan jadwal distribusi makanan.</span>
+            </a>
+        @endif
     </div>
+
+    <form method="POST" action="{{ route('logout') }}" style="margin-top: 24px;">
+        @csrf
+        <button type="submit">Logout</button>
+    </form>
 @endsection
