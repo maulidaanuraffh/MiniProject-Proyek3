@@ -37,13 +37,8 @@
 
             <p>
                 <label for="meal_distribution_id">Distribusi makanan</label><br>
-                <select id="meal_distribution_id" name="meal_distribution_id" required>
-                    <option value="">-- pilih distribusi --</option>
-                    @foreach ($distributions as $distribution)
-                        <option value="{{ $distribution->id }}" @selected(old('meal_distribution_id') == $distribution->id)>
-                            {{ $distribution->school->name }} — {{ $distribution->distribution_date->format('d M Y') }}
-                        </option>
-                    @endforeach
+                <select id="meal_distribution_id" name="meal_distribution_id" required data-old="{{ old('meal_distribution_id') }}">
+                    <option value="">-- pilih sekolah dulu --</option>
                 </select>
             </p>
 
@@ -75,4 +70,67 @@
             <button type="submit">Kirim Laporan</button>
         </form>
     </div>
+
+    <script>
+        (function () {
+            const schoolSelect = document.getElementById('school_id');
+            const distSelect = document.getElementById('meal_distribution_id');
+            const baseUrl = @json(url('/schools'));
+
+            function setPlaceholder(text) {
+                distSelect.innerHTML = '';
+                const opt = document.createElement('option');
+                opt.value = '';
+                opt.textContent = text;
+                distSelect.appendChild(opt);
+            }
+
+            async function loadDistributions(schoolId) {
+                if (!schoolId) {
+                    setPlaceholder('-- pilih sekolah dulu --');
+                    return;
+                }
+
+                setPlaceholder('-- memuat distribusi --');
+
+                try {
+                    const response = await fetch(baseUrl + '/' + schoolId + '/distributions', {
+                        headers: { 'Accept': 'application/json' },
+                        credentials: 'same-origin',
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('HTTP ' + response.status);
+                    }
+
+                    const items = await response.json();
+                    setPlaceholder(items.length ? '-- pilih distribusi --' : '-- belum ada distribusi untuk sekolah ini --');
+
+                    const oldValue = distSelect.dataset.old || '';
+
+                    items.forEach(function (item) {
+                        const opt = document.createElement('option');
+                        opt.value = item.id;
+                        opt.textContent = item.label;
+                        if (String(item.id) === oldValue) {
+                            opt.selected = true;
+                        }
+                        distSelect.appendChild(opt);
+                    });
+                } catch (e) {
+                    setPlaceholder('-- gagal memuat distribusi, coba lagi --');
+                }
+            }
+
+            schoolSelect.addEventListener('change', function () {
+                distSelect.dataset.old = '';
+                loadDistributions(schoolSelect.value);
+            });
+
+            // Jika form dikembalikan karena error validasi, isi ulang distribusinya
+            if (schoolSelect.value) {
+                loadDistributions(schoolSelect.value);
+            }
+        })();
+    </script>
 @endsection
