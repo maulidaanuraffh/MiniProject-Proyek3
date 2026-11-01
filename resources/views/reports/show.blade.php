@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="card">
-        <p><a href="{{ route('reports.index') }}">&larr; Kembali ke daftar</a></p>
+        <a class="btn-back" href="{{ route('reports.index') }}">&larr; Kembali ke daftar</a>
 
         <h1>{{ $report->title }}</h1>
 
@@ -23,6 +23,12 @@
         @endif
 
         <p>Status: <span class="badge badge-{{ $report->status }}">{{ $report->status }}</span></p>
+
+        @can('update', $report)
+            <p style="margin: 16px 0 24px;">
+                <a class="btn btn-primary" href="{{ route('reports.edit', $report) }}">Edit laporan</a>
+            </p>
+        @endcan
 
         <div class="table-wrap">
             <table class="data-table">
@@ -107,7 +113,7 @@
                     </label>
                 </p>
 
-                <button type="submit">Tinjau Laporan</button>
+                <button type="submit" class="btn btn-primary">Tinjau Laporan</button>
             </form>
         @endif
 
@@ -135,7 +141,7 @@
                         <textarea id="coordinator_notes" name="coordinator_notes" rows="4">{{ old('coordinator_notes') }}</textarea>
                     </p>
 
-                    <button type="submit">Teruskan Laporan</button>
+                    <button type="submit" class="btn btn-primary">Teruskan Laporan</button>
                 </form>
             @endif
         @endif
@@ -145,7 +151,7 @@
 
             <form method="POST" action="{{ route('reports.close', $report) }}">
                 @csrf
-                <button type="submit">Tutup Laporan</button>
+                <button type="submit" class="btn btn-primary">Tutup Laporan</button>
             </form>
         @endif
     </div>

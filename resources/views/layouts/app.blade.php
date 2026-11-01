@@ -250,6 +250,45 @@
             color: #52606d;
             line-height: 1.5;
         }
+                .btn {
+            display: inline-block;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: 1px solid #1f4e79;
+            box-sizing: border-box;
+        }
+        .btn-primary {
+            background: #1f4e79;
+            color: #ffffff;
+        }
+        .btn-primary:hover {
+            background: #163a5a;
+        }
+        .btn-secondary {
+            background: #ffffff;
+            color: #1f4e79;
+        }
+        .btn-secondary:hover {
+            background: #f4f6f8;
+        }
+        .btn-back {
+            display: inline-block;
+            margin-bottom: 16px;
+            padding: 6px 12px;
+            border: 1px solid #b8c2cc;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #1f4e79;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .btn-back:hover {
+            background: #f4f6f8;
+        }
     </style>
 </head>
 <body>

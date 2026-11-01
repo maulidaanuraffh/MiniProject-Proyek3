@@ -86,6 +86,82 @@ class ReportController extends Controller
         return Storage::disk('local')->download($report->evidence_path, $report->evidence_original_name);
     }
 
+    public function create(): View
+    {
+        return view('reports.create', [
+            'schools' => School::orderBy('name')->get(),
+            'distributions' => MealDistribution::with('school')
+                ->orderByDesc('distribution_date')
+                ->get(),
+        ]);
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $request->validate($this->reportRules());
+
+        $this->assertDistributionBelongsToSchool($validated);
+
+        // File bukan kolom database, jadi dibuang dari data yang akan disimpan
+        $data = Arr::except($validated, ['evidence']);
+
+        if ($request->hasFile('evidence')) {
+            $file = $request->file('evidence');
+
+            $data['evidence_path'] = $file->store('evidence', 'local');
+            $data['evidence_original_name'] = $file->getClientOriginalName();
+        }
+
+        $report = Report::create([
+            ...$data,
+            'user_id' => $request->user()->id,
+        ]);
+
+        return redirect()
+            ->route('reports.create')
+            ->with('status', 'Laporan "'.$report->title.'" berhasil dikirim dan tercatat dengan status '.$report->status.'.');
+    }
+
+    public function edit(Report $report): View
+    {
+        Gate::authorize('update', $report);
+
+        return view('reports.edit', [
+            'report' => $report->load(['school', 'mealDistribution']),
+            'schools' => School::orderBy('name')->get(),
+        ]);
+    }
+
+    public function update(Request $request, Report $report): RedirectResponse
+    {
+        Gate::authorize('update', $report);
+
+        $validated = $request->validate($this->reportRules());
+
+        $this->assertDistributionBelongsToSchool($validated);
+
+        $data = Arr::except($validated, ['evidence']);
+        $oldEvidencePath = $report->evidence_path;
+
+        if ($request->hasFile('evidence')) {
+            $file = $request->file('evidence');
+
+            $data['evidence_path'] = $file->store('evidence', 'local');
+            $data['evidence_original_name'] = $file->getClientOriginalName();
+        }
+
+        $report->update($data);
+
+        // Bukti lama dihapus hanya setelah update berhasil
+        if (isset($data['evidence_path']) && $oldEvidencePath) {
+            Storage::disk('local')->delete($oldEvidencePath);
+        }
+
+        return redirect()
+            ->route('reports.show', $report)
+            ->with('status', 'Laporan berhasil diperbarui.');
+    }
+
     public function review(Request $request, Report $report, ReportStatusService $statusService): RedirectResponse
     {
         $validated = $request->validate([
@@ -133,19 +209,12 @@ class ReportController extends Controller
             ->with('status', 'Laporan berhasil ditutup.');
     }
 
-    public function create(): View
+    /**
+     * Aturan validasi yang dipakai bersama oleh store dan update.
+     */
+    private function reportRules(): array
     {
-        return view('reports.create', [
-            'schools' => School::orderBy('name')->get(),
-            'distributions' => MealDistribution::with('school')
-                ->orderByDesc('distribution_date')
-                ->get(),
-        ]);
-    }
-
-    public function store(Request $request): RedirectResponse
-    {
-        $validated = $request->validate([
+        return [
             'school_id' => ['required', 'integer', 'exists:schools,id'],
             'meal_distribution_id' => ['required', 'integer', 'exists:meal_distributions,id'],
             'title' => ['required', 'string', 'max:150'],
@@ -154,9 +223,14 @@ class ReportController extends Controller
             'affected_count' => ['nullable', 'integer', 'min:1'],
             'incident_date' => ['required', 'date', 'before_or_equal:today'],
             'evidence' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
-        ]);
+        ];
+    }
 
-        // BR-02: distribusi harus milik sekolah yang dipilih
+    /**
+     * BR-02: distribusi yang dipilih harus milik sekolah yang dipilih.
+     */
+    private function assertDistributionBelongsToSchool(array $validated): void
+    {
         $distribution = MealDistribution::findOrFail($validated['meal_distribution_id']);
 
         if ((int) $distribution->school_id !== (int) $validated['school_id']) {
@@ -164,24 +238,5 @@ class ReportController extends Controller
                 'meal_distribution_id' => 'Distribusi yang dipilih bukan milik sekolah tersebut.',
             ]);
         }
-
-        // File bukan kolom database, jadi dibuang dari data yang akan disimpan
-        $data = Arr::except($validated, ['evidence']);
-
-        if ($request->hasFile('evidence')) {
-            $file = $request->file('evidence');
-
-            $data['evidence_path'] = $file->store('evidence', 'local');
-            $data['evidence_original_name'] = $file->getClientOriginalName();
-        }
-
-        $report = Report::create([
-            ...$data,
-            'user_id' => $request->user()->id,
-        ]);
-
-        return redirect()
-            ->route('reports.create')
-            ->with('status', 'Laporan "'.$report->title.'" berhasil dikirim dan tercatat dengan status '.$report->status.'.');
     }
 }
