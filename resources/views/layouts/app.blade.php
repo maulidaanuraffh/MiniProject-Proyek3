@@ -48,6 +48,28 @@
             font-size: 15px;
             box-sizing: border-box;
         }
+        input[type="checkbox"] {
+            width: auto;
+            max-width: none;
+            margin: 0 8px 0 0;
+            padding: 0;
+            vertical-align: middle;
+        }
+        textarea,
+        select {
+            font-family: inherit;
+            font-size: 15px;
+            padding: 8px 10px;
+            border: 1px solid #b8c2cc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        textarea {
+            width: 100%;
+            max-width: 560px;
+            min-height: 96px;
+            resize: vertical;
+        }
         button {
             background: #1f4e79;
             color: #ffffff;

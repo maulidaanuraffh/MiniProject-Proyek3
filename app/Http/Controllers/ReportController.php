@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\MealDistribution;
 use App\Models\Report;
 use App\Models\School;
+use App\Services\ReportStatusService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -36,6 +38,35 @@ class ReportController extends Controller
             'statuses' => self::STATUSES,
             'filters' => $filters,
         ]);
+    }
+
+    public function show(Report $report): View
+    {
+        Gate::authorize('view', $report);
+
+        // Nama pelapor sengaja tidak dimuat dan tidak ditampilkan (spesifikasi bagian 2)
+        return view('reports.show', [
+            'report' => $report->load(['school', 'mealDistribution', 'monitor']),
+        ]);
+    }
+
+    public function review(Request $request, Report $report, ReportStatusService $statusService): RedirectResponse
+    {
+        $validated = $request->validate([
+            'monitor_notes' => ['nullable', 'string', 'max:2000'],
+            'flagged_for_forwarding' => ['nullable', 'boolean'],
+        ]);
+
+        $statusService->review(
+            $report,
+            $request->user(),
+            $validated['monitor_notes'] ?? null,
+            (bool) ($validated['flagged_for_forwarding'] ?? false),
+        );
+
+        return redirect()
+            ->route('reports.show', $report)
+            ->with('status', 'Laporan berhasil ditinjau dan statusnya menjadi under_review.');
     }
 
     public function create(): View

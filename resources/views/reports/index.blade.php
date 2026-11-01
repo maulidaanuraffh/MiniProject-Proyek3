@@ -51,7 +51,7 @@
                     @forelse ($reports as $report)
                         <tr>
                             <td>#{{ $report->id }}</td>
-                            <td>{{ $report->title }}</td>
+                            <td><a href="{{ route('reports.show', $report) }}">{{ $report->title }}</a></td>
                             <td>{{ $report->school->name }}</td>
                             <td>{{ $report->incident_date->format('d M Y') }}</td>
                             <td><span class="badge badge-{{ $report->status }}">{{ $report->status }}</span></td>
