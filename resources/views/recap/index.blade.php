@@ -6,6 +6,14 @@
     <div class="card">
         <h1>Rekap Laporan</h1>
 
+        @if ($errors->any())
+            <div style="background: #fdecea; border-left: 4px solid #b00020; color: #7a0010; padding: 12px 16px; border-radius: 6px; margin-bottom: 16px;">
+                @foreach ($errors->all() as $error)
+                    <div>{{ $error }}</div>
+                @endforeach
+            </div>
+        @endif
+
         <form method="GET" action="{{ route('recap.index') }}" class="filter-form">
             <div class="filter-field">
                 <label for="from">Dari tanggal kejadian</label>
